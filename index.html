@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winnie's AI Space - 高齡新人的AI之旅</title>
+    <!-- 載入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 載入 Lucide 圖示庫 -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- 自訂 Tailwind 設定與自訂 CSS 動畫 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        theme: {
+                            bgMain: '#FFF9F0',
+                            bgSecondary: '#FFF0E0',
+                            textMain: '#5C4D42',
+                            textAccent: '#D98A6C',
+                            borderAccent: '#F2D5C4',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body { 
+            background-color: #FFF9F0; 
+            color: #5C4D42;
+            overflow-x: hidden;
+        }
+        
+        /* 裝飾性背景動畫 */
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob { animation: blob 7s infinite; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+        
+        /* 淡入上移動畫 */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        .animation-delay-100 { animation-delay: 0.1s; }
+        .animation-delay-200 { animation-delay: 0.2s; }
+        .animation-delay-300 { animation-delay: 0.3s; }
+        .animation-delay-400 { animation-delay: 0.4s; }
+        
+        /* 緩慢彈跳動畫 */
+        @keyframes bounceSlow {
+            0%, 100% { transform: translateY(-5%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
+            50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); }
+        }
+        .animate-bounce-slow { animation: bounceSlow 3s infinite; }
+
+        /* 導覽列啟用狀態 */
+        .nav-link.active { color: #D98A6C; font-weight: 600; }
+        .mobile-nav-link.active { background-color: #FFF0E0; color: #D98A6C; }
+    </style>
+</head>
+<body class="selection:bg-theme-borderAccent font-sans antialiased">
+
+    <!-- 隱藏的音效元素 -->
+    <audio id="bgMusic" loop src="https://img.ai365.fans/artworks/34d1eb68-f546-4381-865d-c50a4d6332fe/tu5vvwpc9e.mp3"></audio>
+
+    <!-- 導覽列 -->
+    <nav class="fixed w-full z-50 transition-all duration-300 backdrop-blur-md bg-theme-bgMain/80 shadow-sm border-b border-theme-borderAccent" id="navbar">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                
+                <!-- Logo 區塊 -->
+                <div class="flex items-center cursor-pointer group" onclick="scrollToSection('home')">
+                    <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-theme-textAccent p-0.5 shadow-sm group-hover:scale-105 transition-transform bg-white flex items-center justify-center">
+                        <img src="https://duk.tw/Peuxae.jpg" alt="Winnie" class="w-full h-full object-cover rounded-full" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23D98A6C\'%3E%3Cpath d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/%3E%3C/svg%3E'">
+                    </div>
+                    <span class="ml-3 text-xl font-bold text-theme-textAccent">Winnie's AI Space</span>
+                </div>
+
+                <!-- 電腦版選單 -->
+                <div class="hidden md:flex space-x-8 items-center">
+                    <button onclick="scrollToSection('home')" class="nav-link text-theme-textMain hover:text-theme-textAccent font-medium transition-colors" data-target="home">首頁</button>
+                    <button onclick="scrollToSection('about')" class="nav-link text-theme-textMain hover:text-theme-textAccent font-medium transition-colors" data-target="about">關於我</button>
+                    <button onclick="scrollToSection('journey')" class="nav-link text-theme-textMain hover:text-theme-textAccent font-medium transition-colors" data-target="journey">AI之旅</button>
+                    <button onclick="scrollToSection('contact')" class="nav-link text-theme-textMain hover:text-theme-textAccent font-medium transition-colors" data-target="contact">聯絡我</button>
+                    
+                    <!-- 電腦版音樂控制 -->
+                    <div class="flex items-center space-x-2 bg-white px-3 py-1.5 rounded-full shadow-sm border border-theme-borderAccent">
+                        <button onclick="toggleAudio()" id="desktopPlayBtn" class="p-1.5 rounded-full bg-theme-borderAccent hover:bg-[#E5C1AD] text-theme-textMain transition-transform hover:scale-110" aria-label="Play/Pause">
+                            <i data-lucide="play" class="w-4 h-4 ml-0.5" id="desktopPlayIcon"></i>
+                        </button>
+                        <button onclick="toggleMute()" id="desktopMuteBtn" class="p-1 text-gray-500 hover:text-theme-textAccent transition-colors" aria-label="Mute/Unmute">
+                            <i data-lucide="volume-2" class="w-4 h-4" id="desktopMuteIcon"></i>
+                        </button>
+                        <span class="text-xs font-medium text-gray-400">背景音樂</span>
+                    </div>
+                </div>
+
+                <!-- 手機版選單按鈕與音樂按鈕 -->
+                <div class="md:hidden flex items-center space-x-4">
+                    <button onclick="toggleAudio()" id="mobilePlayBtn" class="p-2 rounded-full bg-white text-theme-textAccent shadow-sm">
+                        <i data-lucide="play" class="w-[18px] h-[18px] ml-0.5" id="mobilePlayIcon"></i>
+                    </button>
+                    <button onclick="toggleMobileMenu()" class="text-gray-500 hover:text-theme-textAccent focus:outline-none">
+                        <i data-lucide="menu" class="w-6 h-6" id="menuIcon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 手機版下拉選單 -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-b border-theme-borderAccent shadow-lg absolute w-full left-0 transition-all">
+            <div class="px-4 pt-2 pb-6 space-y-2">
+                <button onclick="scrollToSection('home')" class="mobile-nav-link block w-full text-left px-4 py-3 rounded-xl font-medium hover:bg-gray-50" data-target="home">首頁</button>
+                <button onclick="scrollToSection('about')" class="mobile-nav-link block w-full text-left px-4 py-3 rounded-xl font-medium hover:bg-gray-50" data-target="about">關於我</button>
+                <button onclick="scrollToSection('journey')" class="mobile-nav-link block w-full text-left px-4 py-3 rounded-xl font-medium hover:bg-gray-50" data-target="journey">AI之旅</button>
+                <button onclick="scrollToSection('contact')" class="mobile-nav-link block w-full text-left px-4 py-3 rounded-xl font-medium hover:bg-gray-50" data-target="contact">聯絡我</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要內容區 -->
+    <main class="pt-20">
+        
+        <!-- 第 1 區段: 首頁英雄區 (Hero Section) -->
+        <section id="home" class="min-h-[90vh] flex items-center justify-center relative overflow-hidden pt-10">
+            <!-- 裝飾性背景球體 -->
+            <div class="absolute top-20 left-10 w-32 h-32 bg-[#F2D5C4] rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob"></div>
+            <div class="absolute top-40 right-10 w-40 h-40 bg-[#FFF0E0] rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-2000"></div>
+            <div class="absolute -bottom-8 left-1/2 w-48 h-48 bg-[#FCD8D4] rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-4000"></div>
+
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-12">
+                    
+                    <!-- 左側文字說明 -->
+                    <div class="w-full md:w-1/2 text-center md:text-left space-y-6">
+                        <div class="inline-flex items-center space-x-2 bg-white px-4 py-2 rounded-full shadow-sm border border-theme-borderAccent animate-fade-in-up">
+                            <i data-lucide="star" class="w-4 h-4 text-theme-textAccent fill-current"></i>
+                            <span class="text-sm font-medium tracking-wide">活到老，學到老</span>
+                        </div>
+                        
+                        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight animate-fade-in-up animation-delay-100">
+                            你好！我是 <span class="text-theme-textAccent">Winnie</span>, <br class="hidden md:block"/>
+                            AI 領域的<span class="relative inline-block">
+                                高齡新人
+                                <svg class="absolute w-full h-3 -bottom-1 left-0 text-theme-borderAccent" viewBox="0 0 100 10" preserveAspectRatio="none">
+                                    <path d="M0 5 Q 50 15 100 5" stroke="currentColor" stroke-width="3" fill="transparent" />
+                                </svg>
+                            </span>
+                        </h1>
+                        
+                        <p class="text-lg md:text-xl text-gray-600 max-w-lg mx-auto md:mx-0 animate-fade-in-up animation-delay-200 leading-relaxed">
+                            為了進入全新領域而加油打拼！在這裡記錄我的學習點滴與冒險旅程。
+                        </p>
+                        
+                        <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 pt-4 animate-fade-in-up animation-delay-300">
+                            <button onclick="scrollToSection('about')" class="px-8 py-3.5 rounded-full font-bold shadow-lg shadow-[#D98A6C]/30 transition-all hover:-translate-y-1 bg-theme-textAccent hover:bg-[#C2785D] text-white">
+                                認識我更多
+                            </button>
+                            <button onclick="scrollToSection('journey')" class="px-8 py-3.5 rounded-full font-bold bg-white text-theme-textMain border-2 border-theme-borderAccent hover:bg-theme-bgSecondary transition-all">
+                                我的學習歷程
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 右側相框圖片 -->
+                    <div class="w-full md:w-1/2 flex justify-center animate-fade-in-up animation-delay-400 mt-10 md:mt-0">
+                        <div class="relative">
+                            <!-- 漸層暖色外框 -->
+                            <div class="relative w-72 h-72 md:w-96 md:h-96 p-4 bg-gradient-to-tr from-[#FFF0E0] to-[#F2D5C4] shadow-2xl rounded-[3rem] transform md:-rotate-2 hover:rotate-0 transition-transform duration-300">
+                                <!-- 白色內框與裁切區 -->
+                                <div class="w-full h-full rounded-[2.5rem] overflow-hidden bg-white flex items-center justify-center border-4 border-white shadow-inner relative">
+                                    <img 
+                                        src="https://duk.tw/Peuxae.jpg" 
+                                        alt="Winnie giving a thumbs up" 
+                                        class="absolute inset-0 w-full h-full object-cover"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <!-- 浮動圖示徽章 -->
+                            <div class="absolute -top-4 -right-4 bg-white p-3 rounded-2xl shadow-lg border border-gray-100 animate-bounce-slow">
+                                <i data-lucide="sparkles" class="text-yellow-400 w-8 h-8"></i>
+                            </div>
+                            <div class="absolute bottom-10 -left-6 bg-white px-4 py-2 rounded-2xl shadow-lg border border-gray-100 animate-bounce-slow" style="animation-delay: 1s;">
+                                <span class="font-bold text-theme-textAccent flex items-center gap-1">
+                                    <i data-lucide="thumbs-up" class="w-4 h-4 fill-current"></i> 充滿熱情
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 第 2 區段: 關於我 (About) -->
+        <section id="about" class="py-24 relative bg-theme-bgSecondary">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold inline-block relative text-theme-textMain">
+                        關於 Winnie
+                        <div class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-theme-textAccent rounded-full"></div>
+                    </h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- 卡片 1 -->
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-theme-borderAccent hover:shadow-md transition-shadow">
+                        <div class="w-14 h-14 bg-theme-bgSecondary rounded-2xl flex items-center justify-center mb-6 text-theme-textAccent">
+                            <i data-lucide="heart" class="w-7 h-7"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-theme-textMain">勇敢跨界</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            年齡只是一個數字！我決定跳脫舒適圈，以新人之姿踏入充滿未知與挑戰的 AI 領域，證明學習永遠不嫌晚。
+                        </p>
+                    </div>
+
+                    <!-- 卡片 2 -->
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-theme-borderAccent hover:shadow-md transition-shadow transform md:-translate-y-4">
+                        <div class="w-14 h-14 bg-theme-bgSecondary rounded-2xl flex items-center justify-center mb-6 text-theme-textAccent">
+                            <i data-lucide="book-open" class="w-7 h-7"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-theme-textMain">持續學習</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            每天都在吸收新知識，從基礎概念到實際操作，雖然有時會感到挫折，但每解開一個難題，成就感都無與倫比。
+                        </p>
+                    </div>
+
+                    <!-- 卡片 3 -->
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-theme-borderAccent hover:shadow-md transition-shadow">
+                        <div class="w-14 h-14 bg-theme-bgSecondary rounded-2xl flex items-center justify-center mb-6 text-theme-textAccent">
+                            <i data-lucide="coffee" class="w-7 h-7"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-theme-textMain">樂觀面對</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            帶著一杯好茶和滿滿的熱忱，我用溫暖、樂觀的態度迎接每天的學習挑戰。希望我的故事也能鼓勵到你！
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部波浪形狀分隔線 -->
+            <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none rotate-180">
+                <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" class="relative block w-full h-[50px] md:h-[80px]" style="fill: #FFF9F0;">
+                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"></path>
+                </svg>
+            </div>
+        </section>
+
+        <!-- 第 3 區段: AI之旅 (Journey) -->
+        <section id="journey" class="py-24 relative bg-theme-bgMain">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold inline-block relative text-theme-textMain">
+                        AI 冒險日誌
+                        <div class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-theme-textAccent rounded-full"></div>
+                    </h2>
+                    <p class="mt-6 text-gray-600">紀錄我一步一腳印的學習軌跡</p>
+                </div>
+
+                <!-- 時間軸設計 -->
+                <div class="relative border-l-4 border-theme-borderAccent ml-4 md:ml-0 md:pl-0 space-y-12">
+                    
+                    <!-- 節點 1 -->
+                    <div class="relative pl-8 md:pl-0">
+                        <div class="md:w-1/2 md:pr-12 md:text-right">
+                            <div class="absolute w-8 h-8 bg-white border-4 border-theme-textAccent rounded-full -left-[18px] md:left-1/2 md:-ml-4 top-1 z-10 flex items-center justify-center shadow-sm"></div>
+                            <div class="bg-theme-bgSecondary p-6 rounded-2xl rounded-tl-none md:rounded-tl-2xl md:rounded-tr-none shadow-sm relative md:mr-0 inline-block w-full">
+                                <span class="text-sm font-bold text-theme-textAccent mb-2 block">第一步：下定決心</span>
+                                <h4 class="text-xl font-bold mb-2 text-theme-textMain">認識 AI 的奧妙</h4>
+                                <p class="text-gray-700 text-sm md:text-base">被 ChatGPT 驚豔到，決定不能只當個旁觀者，買了第一本 AI 入門書，開始了解什麼是機器學習、什麼是提示詞 (Prompt)。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 節點 2 -->
+                    <div class="relative pl-8 md:pl-0">
+                        <div class="md:w-1/2 md:ml-auto md:pl-12">
+                            <div class="absolute w-8 h-8 bg-white border-4 border-theme-textAccent rounded-full -left-[18px] md:left-1/2 md:-ml-4 top-1 z-10 flex items-center justify-center shadow-sm"></div>
+                            <div class="bg-white border border-theme-borderAccent p-6 rounded-2xl rounded-tl-none shadow-sm relative inline-block w-full">
+                                <span class="text-sm font-bold text-theme-textAccent mb-2 block">第二步：動手實作</span>
+                                <h4 class="text-xl font-bold mb-2 text-theme-textMain">學習詠唱魔法</h4>
+                                <p class="text-gray-700 text-sm md:text-base">報名了線上課程，每天花時間練習如何下精準的指令，開始能用 AI 幫我生成圖片、整理文章，感覺自己變成了魔法師！</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 節點 3 (現在) -->
+                    <div class="relative pl-8 md:pl-0">
+                        <div class="md:w-1/2 md:pr-12 md:text-right">
+                            <div class="absolute w-8 h-8 bg-theme-textAccent border-4 border-white rounded-full -left-[18px] md:left-1/2 md:-ml-4 top-1 z-10 flex items-center justify-center shadow-md animate-pulse"></div>
+                            <div class="bg-theme-textAccent text-white p-6 rounded-2xl rounded-tl-none md:rounded-tl-2xl md:rounded-tr-none shadow-md relative inline-block w-full">
+                                <span class="text-sm font-bold text-[#FFF0E0] mb-2 block">現在：持續前進</span>
+                                <h4 class="text-xl font-bold mb-2">建立這個網站</h4>
+                                <p class="text-white/90 text-sm md:text-base">雖然是高齡新人，但在 AI 的輔助下，我也能擁有自己漂亮的一頁式網站。每天都在加油打拼，期待未來的無限可能！</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 電腦版置中時間軸中線 -->
+                    <div class="hidden md:block absolute h-full border-l-4 border-theme-borderAccent left-1/2 transform -translate-x-1/2 top-0 -z-10"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第 4 區段: 聯絡我 (Contact) -->
+        <section id="contact" class="py-24 bg-theme-bgSecondary relative overflow-hidden">
+             <!-- 裝飾元素 -->
+             <div class="absolute top-0 right-0 w-64 h-64 bg-white/40 rounded-full mix-blend-overlay filter blur-3xl"></div>
+             <div class="absolute bottom-0 left-0 w-64 h-64 bg-theme-textAccent/10 rounded-full mix-blend-overlay filter blur-3xl"></div>
+
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-theme-borderAccent text-center">
+                    <div class="w-20 h-20 mx-auto bg-theme-bgSecondary rounded-full flex items-center justify-center mb-6">
+                        <i data-lucide="mail" class="w-10 h-10 text-theme-textAccent"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold mb-4 text-theme-textMain">為我加油打氣！</h2>
+                    <p class="text-gray-600 mb-8 max-w-lg mx-auto">
+                        如果您也喜歡我的故事，或者同樣在學習新事物的路上努力，歡迎互相交流鼓勵！
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row justify-center gap-4">
+                        <a href="mailto:hello@example.com" class="inline-flex items-center justify-center px-8 py-4 rounded-full font-bold shadow-md transition-transform hover:-translate-y-1 bg-theme-textAccent hover:bg-[#C2785D] text-white">
+                            <i data-lucide="send" class="w-5 h-5 mr-2"></i>
+                            寄信給 Winnie
+                        </a>
+                    </div>
+                    
+                    <!-- 底部音樂控制提示 -->
+                    <div class="mt-10 pt-8 border-t border-gray-100">
+                        <p class="text-sm font-medium text-gray-500 mb-4">溫馨提示：別忘了開啟背景音樂享受溫暖氛圍喔！</p>
+                        <button onclick="toggleAudio()" id="footerPlayBtn" class="inline-flex items-center justify-center px-6 py-2 rounded-full text-sm font-medium bg-theme-bgMain text-theme-textAccent border border-theme-borderAccent hover:bg-theme-bgSecondary transition-colors">
+                            <i data-lucide="play" class="w-4 h-4 mr-2" id="footerPlayIcon"></i>
+                            <span id="footerPlayText">播放音樂</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 Footer -->
+    <footer class="bg-white py-8 border-t border-theme-borderAccent text-center">
+        <p class="text-sm text-gray-500">
+            &copy; <span id="year"></span> Winnie's AI Journey. 活到老，學到老。
+        </p>
+    </footer>
+
+    <!-- JavaScript 邏輯控制 -->
+    <script>
+        // 初始化 Lucide 圖示
+        lucide.createIcons();
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // 狀態變數
+        let isPlaying = false;
+        let isMuted = false;
+        let isMobileMenuOpen = false;
+        
+        const audio = document.getElementById('bgMusic');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        // 音樂控制函數
+        function toggleAudio() {
+            if (isPlaying) {
+                audio.pause();
+            } else {
+                audio.play().catch(e => console.log("Audio play failed:", e));
+            }
+            isPlaying = !isPlaying;
+            updateAudioIcons();
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            audio.muted = isMuted;
+            updateAudioIcons();
+        }
+
+        function updateAudioIcons() {
+            // 更新電腦版按鈕
+            const desktopPlayIcon = document.getElementById('desktopPlayIcon');
+            const desktopPlayBtn = document.getElementById('desktopPlayBtn');
+            const desktopMuteIcon = document.getElementById('desktopMuteIcon');
+            
+            // 更新手機版按鈕
+            const mobilePlayIcon = document.getElementById('mobilePlayIcon');
+            const mobilePlayBtn = document.getElementById('mobilePlayBtn');
+            
+            // 更新頁尾按鈕
+            const footerPlayIcon = document.getElementById('footerPlayIcon');
+            const footerPlayText = document.getElementById('footerPlayText');
+
+            if (isPlaying) {
+                // 替換圖示為暫停 (使用 lucide.createIcons 更新動態建立的節點較麻煩，這裡直接換 class 或 data-lucide，最簡單是重繪)
+                desktopPlayBtn.innerHTML = '<i data-lucide="pause" class="w-4 h-4" id="desktopPlayIcon"></i>';
+                mobilePlayBtn.innerHTML = '<i data-lucide="pause" class="w-[18px] h-[18px]" id="mobilePlayIcon"></i>';
+                mobilePlayBtn.className = 'p-2 rounded-full bg-[#D98A6C] text-white shadow-sm';
+                document.getElementById('footerPlayBtn').innerHTML = '<i data-lucide="pause" class="w-4 h-4 mr-2" id="footerPlayIcon"></i><span id="footerPlayText">暫停音樂</span>';
+            } else {
+                desktopPlayBtn.innerHTML = '<i data-lucide="play" class="w-4 h-4 ml-0.5" id="desktopPlayIcon"></i>';
+                mobilePlayBtn.innerHTML = '<i data-lucide="play" class="w-[18px] h-[18px] ml-0.5" id="mobilePlayIcon"></i>';
+                mobilePlayBtn.className = 'p-2 rounded-full bg-white text-[#D98A6C] shadow-sm';
+                document.getElementById('footerPlayBtn').innerHTML = '<i data-lucide="play" class="w-4 h-4 mr-2" id="footerPlayIcon"></i><span id="footerPlayText">播放音樂</span>';
+            }
+
+            if (isMuted) {
+                document.getElementById('desktopMuteBtn').innerHTML = '<i data-lucide="volume-x" class="w-4 h-4" id="desktopMuteIcon"></i>';
+            } else {
+                document.getElementById('desktopMuteBtn').innerHTML = '<i data-lucide="volume-2" class="w-4 h-4" id="desktopMuteIcon"></i>';
+            }
+            lucide.createIcons(); // 重新渲染剛注入的圖示
+        }
+
+        // 手機選單控制
+        function toggleMobileMenu() {
+            isMobileMenuOpen = !isMobileMenuOpen;
+            if (isMobileMenuOpen) {
+                mobileMenu.classList.remove('hidden');
+                document.querySelector('[data-lucide="menu"]').outerHTML = '<i data-lucide="x" class="w-6 h-6" id="menuIcon"></i>';
+            } else {
+                mobileMenu.classList.add('hidden');
+                document.querySelector('[data-lucide="x"]').outerHTML = '<i data-lucide="menu" class="w-6 h-6" id="menuIcon"></i>';
+            }
+            lucide.createIcons();
+        }
+
+        // 滾動到特定區塊
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+            if (isMobileMenuOpen) {
+                toggleMobileMenu();
+            }
+        }
+
+        // 監聽滾動事件，更新導覽列醒目提示
+        window.addEventListener('scroll', () => {
+            const sections = ['home', 'about', 'journey', 'contact'];
+            let current = '';
+
+            for (const section of sections) {
+                const element = document.getElementById(section);
+                if (element) {
+                    const rect = element.getBoundingClientRect();
+                    // 如果區塊頂部在視窗內
+                    if (rect.top <= 150 && rect.bottom >= 150) {
+                        current = section;
+                        break;
+                    }
+                }
+            }
+
+            // 更新選單樣式
+            document.querySelectorAll('.nav-link, .mobile-nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-target') === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // 預設將首頁設為 active
+        document.querySelector('.nav-link[data-target="home"]').classList.add('active');
+    </script>
+</body>
+</html>
